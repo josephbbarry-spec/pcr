@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Punters Club</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap">
+<style>
+:root{color-scheme:dark;--bg:#080c18;--surface:#0f1529;--ink:#e8ecf7;--mute:#8a94b0;--line:#1f2947;--turf:#2ee6a6;--loss:#ff6b81;--gold:#ffc24b;--chip:#1a2342;--accent:#5b8cff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:radial-gradient(900px 420px at 80% -80px,rgba(91,140,255,.18),transparent 70%),var(--bg);color:var(--ink);font-family:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+main{max-width:980px;margin:0 auto;padding:28px 18px 60px}
+h1{font-size:clamp(30px,6vw,44px);font-weight:700;letter-spacing:-.03em;margin:0;line-height:1}
+h2{font-size:20px;font-weight:700;margin:40px 0 4px}
+.sub{color:var(--mute);margin:6px 0 0}
+.note{color:var(--mute);font-size:14px;margin:0 0 12px;max-width:68ch}
+.hero{margin-top:26px;background:linear-gradient(160deg,#141c38,#0b1022);border:1px solid var(--line);border-radius:16px;box-shadow:0 20px 60px -24px rgba(91,140,255,.45);padding:24px 22px 28px}
+.big{display:flex;flex-wrap:wrap;gap:8px 40px;align-items:baseline}
+.big b{font-size:clamp(38px,8vw,64px);font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1;display:block}
+.big span{color:var(--mute);font-size:14px}
+.track{position:relative;height:14px;margin:48px 0 34px;background:var(--chip);border-radius:999px}
+.fill{position:absolute;inset:0 auto 0 0;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--turf));box-shadow:0 0 18px rgba(46,230,166,.45)}
+.tick{position:absolute;top:-8px;bottom:-8px;width:0;border-left:1px dashed var(--mute)}
+.tick i{position:absolute;top:-26px;left:0;transform:translateX(-50%);font-style:normal;font-size:12px;white-space:nowrap}
+.tick.end i{transform:translateX(-100%)}
+.tick.low{border-left:2px dashed var(--mute)}
+.tick.low i{top:auto;bottom:-26px;color:var(--mute)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:6px}
+.stat{border-top:1px solid var(--line);padding-top:10px}
+.stat b{font-size:24px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;display:block}
+.stat span{font-size:13px;color:var(--mute)}
+.pos{color:var(--turf)}.neg{color:var(--loss)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
+.scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:560px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-weight:600;color:var(--mute);font-size:13px}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:0}
+.chip{display:inline-block;padding:1px 9px;border-radius:10px;font-size:12px;font-weight:600;background:var(--chip)}
+.chip.Win{background:rgba(46,230,166,.14);color:var(--turf)}.chip.Lose{background:rgba(255,107,129,.14);color:var(--loss)}.chip.Pending{background:rgba(255,194,75,.14);color:var(--gold)}
+.flag{color:var(--loss);font-weight:700}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+svg{width:100%;height:auto;display:block}hr{border:0;border-top:1px solid var(--line);margin:12px 0}
+footer{margin-top:40px;color:var(--mute);font-size:13px}
+</style>
+</head>
+<body>
+<main>
+<h1>Punters Club</h1>
+<p class="sub" id="asof"></p>
+
+<section class="hero" aria-label="Progress to the vault">
+ <div class="big">
+  <div><b id="pot"></b><span>in the pot now</span></div>
+  <div><b id="togo"></b><span>to reach the $1,200 vault</span></div>
+ </div>
+ <div class="track" id="track"><div class="fill" id="fill"></div>
+  <div class="tick low" style="left:50%"><i>Start $600</i></div>
+  <div class="tick end" style="left:100%"><i>Vault $1,200</i></div></div>
+ <div class="stats" id="stats"></div>
+</section>
+
+<h2>Pot over time</h2>
+<p class="note">Each point is the pot after a punt, in the order they are logged. The pending Arsenal stake is already taken out.</p>
+<div class="card"><div id="chart"></div></div>
+
+<h2>Punters</h2>
+<p class="note">Settled punts only. Net P/L is returns minus stakes.</p>
+<div class="scroll"><table id="board"></table></div>
+
+<div class="two">
+ <div><h2>By sport</h2><div class="scroll"><table id="sports"></table></div></div>
+ <div><h2>Still in play</h2><div class="card" id="pending"></div></div>
+</div>
+
+<h2>Club rules check</h2>
+<p class="note">A stake above 25% of the pot, or odds above 9/1 (10.00 decimal), needs a vote from the other three Punters.</p>
+<div class="card" id="rules"></div>
+
+<h2>Bonus bets</h2>
+<p class="note">Free bets sit outside the club P&amp;L, so none of this touches the pot above.</p>
+<div class="card" id="bonusSum" style="margin-bottom:12px"></div>
+<div class="scroll"><table id="bonus"></table></div>
+
+<h2>Every punt</h2>
+<div class="scroll"><table id="log"></table></div>
+
+<footer>Built from the Punters Club Redux sheet. Odds are decimal. Return includes the stake.</footer>
+</main>
+
+<script>
+const START=600,TARGET=1200,VAULT=0,ASOF="21 Oct 2026";
+const bets=[
+[2,"2026-08-31","Dan","4 leg multi, UK football","Football",9.31,25,"Lose"],
+[2,"2026-08-31","Group","Arsenal to win the league","Football",1.83,25,"Pending"],
+[2,"2026-09-07","Paul","4 leg multi, CL","Football",6.08,50,"Win"],
+[2,"2026-09-07","Mark","Wabbits, Villa & NFL","Mixed",7.92,50,"Lose"],
+[2,"2026-09-07","Joe","Wednesday & Southampton","Football",3.02,100,"Lose"],
+[3,"2026-09-14","Paul","Football multi","Football",8.65,54,"Lose"],
+[3,"2026-09-14","Dan","Warriors v Knights multi","NRL",3.34,50,"Lose"],
+[3,"2026-09-21","Paul","AFL Grand Final multi","AFL",9.58,50,"Lose"],
+[3,"2026-09-21","Joe","UK football multi","Football",3.23,35,"Lose"],
+[4,"2026-09-28","Dan","NRL Grand Final multi","NRL",5.11,50,"Lose"],
+[4,"2026-09-28","Mark","Eagles & Brazil multi","Mixed",2.61,50,"Lose"],
+[4,"2026-10-05","Paul","UK football multi","Football",2.96,50,"Win"],
+[4,"2026-10-05","Joe","European football multi","Football",3.41,35,"Win"],
+[5,"2026-10-12","Mark","CL multi","Football",4.95,50,"Win"],
+[5,"2026-10-12","Dan","Bledisloe","Rugby Union",2.2,50,"Lose"],
+[5,"2026-10-19","Paul","CL multi","Football",4.16,50,"Win"]
+].map(r=>({round:r[0],wc:r[1],who:r[2],bet:r[3],sport:r[4],odds:r[5],stake:r[6],res:r[7]}));
+const bonus=[
+["2026-08-17","Paul","Melbourne vs Bulldogs multi","AFL",8.78,50,"Lose"],
+["2026-08-17","Dan","North Melbourne to beat Swans","AFL",2.1,50,"Lose"],
+["2026-08-24","Mark","4 sport multi","Mixed",4.37,50,"Lose"],
+["2026-08-24","Joe","Bulldogs vs Collingwood multi","AFL",4.13,50,"Lose"],
+["2026-10-05","Paul","Football multi","Football",4.1,55,"Lose"]
+].map(r=>({wc:r[0],who:r[1],bet:r[2],sport:r[3],odds:r[4],stake:r[5],res:r[6]}));
+
+const $=id=>document.getElementById(id);
+const m=n=>"$"+Math.abs(n).toLocaleString("en-AU",{minimumFractionDigits:2,maximumFractionDigits:2});
+const sg=n=>(n<0?"\u2212":n>0?"+":"")+m(n);
+const cls=n=>n>0?"pos":n<0?"neg":"";
+const dt=s=>new Date(s+"T00:00:00").toLocaleDateString("en-AU",{day:"numeric",month:"short"});
+
+let pot=START;
+bets.forEach(b=>{
+ b.before=pot;
+ b.ret=b.res==="Win"?b.odds*b.stake:b.res==="Lose"?0:null;
+ b.pl=b.ret===null?-b.stake:b.ret-b.stake;
+ pot+=b.pl; b.after=pot;
+ b.share=b.stake/b.before;
+ b.over=b.share>0.25||b.odds>10;
+});
+const settled=bets.filter(b=>b.res!=="Pending"),open=bets.filter(b=>b.res==="Pending");
+const wins=settled.filter(b=>b.res==="Win").length;
+const net=pot-START,togo=TARGET-pot-VAULT;
+
+$("asof").textContent="Updated "+ASOF+", round "+Math.max(...bets.map(b=>b.round));
+$("pot").textContent=m(pot);
+$("togo").textContent=m(togo);
+$("fill").style.width=Math.min(100,(pot+VAULT)/TARGET*100)+"%";
+const inPlay=open.reduce((s,b)=>s+b.stake,0);
+$("stats").innerHTML=[
+ [sg(net),"Net P/L since the start"+(inPlay?" (includes "+m(inPlay)+" in play)":""),cls(net)],
+ [Math.round((pot+VAULT)/TARGET*100)+"%","of the way to $1,200",""],
+ [m(VAULT),"already in the vault",""],
+ [wins+" of "+settled.length,"punts won ("+Math.round(wins/settled.length*100)+"%)",""]
+].map(s=>`<div class="stat"><b class="${s[2]}">${s[0]}</b><span>${s[1]}</span></div>`).join("");
+
+// chart
+(function(){
+ const pts=[START].concat(bets.map(b=>b.after)),W=720,H=260,L=46,R=14,T=14,B=26,lo=300,hi=1250;
+ const x=i=>L+i*(W-L-R)/(pts.length-1),y=v=>T+(hi-v)*(H-T-B)/(hi-lo);
+ let g="";
+ [400,600,800,1000,1200].forEach(v=>{g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" ${v===600||v===1200?'stroke-dasharray="5 4" stroke="var(--ink)"':''}/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--mute)">${v}</text>`});
+ const d=pts.map((v,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(v).toFixed(1)).join(" ");
+ const dots=bets.map((b,i)=>`<circle cx="${x(i+1)}" cy="${y(b.after)}" r="4.5" fill="${b.res==="Win"?"var(--turf)":b.res==="Lose"?"var(--loss)":"var(--gold)"}" stroke="var(--surface)" stroke-width="1.5"><title>${b.who}: ${b.bet} (${b.res}) pot ${m(b.after)}</title></circle>`).join("");
+ $("chart").innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Pot after each punt">${g}<path d="${d}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/>${dots}<text x="${L}" y="${H-6}" font-size="11" fill="var(--mute)">Green is a win, red a loss, amber pending</text></svg>`;
+})();
+
+// aggregates
+function agg(key,label){
+ const map={};
+ settled.forEach(b=>{const k=b[key];(map[k]=map[k]||{k,n:0,w:0,st:0,pl:0,od:0});const a=map[k];a.n++;a.w+=b.res==="Win";a.st+=b.stake;a.pl+=b.pl;a.od+=b.odds});
+ const rows=Object.values(map).sort((a,b)=>b.pl-a.pl);
+ return `<thead><tr><th>${label}</th><th class="n">Punts</th><th class="n">Won</th><th class="n">Strike</th><th class="n">Staked</th><th class="n">Net P/L</th><th class="n">Avg odds</th></tr></thead><tbody>`+
+ rows.map(a=>`<tr><td>${a.k}</td><td class="n">${a.n}</td><td class="n">${a.w}</td><td class="n">${Math.round(a.w/a.n*100)}%</td><td class="n">${m(a.st)}</td><td class="n ${cls(a.pl)}">${sg(a.pl)}</td><td class="n">${(a.od/a.n).toFixed(2)}</td></tr>`).join("")+"</tbody>";
+}
+$("board").innerHTML=agg("who","Punter");
+$("sports").innerHTML=agg("sport","Sport");
+
+$("pending").innerHTML=open.length?open.map(b=>`<b>${b.bet}</b><br>${b.who} punt at ${b.odds.toFixed(2)}, stake ${m(b.stake)}.<br>A win returns ${m(b.stake*b.odds)}, which would lift the pot to ${m(pot+b.stake*b.odds)}.`).join("<hr>"):"Nothing pending.";
+
+const flagged=bets.filter(b=>b.over),topShare=[...bets].sort((a,b)=>b.share-a.share)[0],topOdds=[...bets].sort((a,b)=>b.odds-a.odds)[0];
+$("rules").innerHTML=(flagged.length?`<span class="flag">${flagged.length} punt(s) needed a vote:</span> ${flagged.map(b=>b.who+" "+b.bet).join(", ")}.`:`All ${bets.length} punts sit inside both limits.`)+
+ `<br>Biggest stake: ${topShare.who} put ${m(topShare.stake)} on ${topShare.bet} (${Math.round(topShare.share*100)}% of the pot).<br>Longest odds: ${topOdds.who} at ${topOdds.odds.toFixed(2)} on ${topOdds.bet}.`;
+
+const bs=bonus.reduce((s,b)=>s+b.stake,0),br=bonus.reduce((s,b)=>s+(b.res==="Win"?b.odds*b.stake:0),0);
+$("bonusSum").innerHTML=`${bonus.length} bonus bets worth ${m(bs)} in free stakes have returned <b>${m(br)}</b>. Record: ${bonus.filter(b=>b.res==="Win").length} won, ${bonus.filter(b=>b.res==="Lose").length} lost.`;
+const rowB=b=>`<tr><td>${dt(b.wc)}</td><td>${b.who}</td><td>${b.bet}</td><td>${b.sport}</td><td class="n">${b.odds.toFixed(2)}</td><td class="n">${m(b.stake)}</td><td><span class="chip ${b.res}">${b.res}</span></td></tr>`;
+$("bonus").innerHTML=`<thead><tr><th>w/c</th><th>Punter</th><th>Bet</th><th>Sport</th><th class="n">Odds</th><th class="n">Free stake</th><th>Result</th></tr></thead><tbody>${bonus.map(rowB).join("")}</tbody>`;
+
+$("log").innerHTML=`<thead><tr><th>w/c</th><th>Punter</th><th>Bet</th><th class="n">Odds</th><th class="n">Stake</th><th class="n">% of pot</th><th>Result</th><th class="n">P/L</th><th class="n">Pot after</th></tr></thead><tbody>`+
+ bets.map(b=>`<tr><td>${dt(b.wc)}</td><td>${b.who}</td><td>${b.bet}</td><td class="n">${b.odds.toFixed(2)}</td><td class="n">${m(b.stake)}</td><td class="n ${b.over?"flag":""}">${Math.round(b.share*100)}%</td><td><span class="chip ${b.res}">${b.res}</span></td><td class="n ${b.res==="Pending"?"":cls(b.pl)}">${b.res==="Pending"?"in play":sg(b.pl)}</td><td class="n">${m(b.after)}</td></tr>`).join("")+"</tbody>";
+</script>
+</body>
+</html>
